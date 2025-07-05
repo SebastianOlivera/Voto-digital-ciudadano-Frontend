@@ -315,7 +315,6 @@ class ApiService {
 
   async createCircuito(data: {
     numero_circuito: string;
-    numero_mesa: string;
     establecimiento_id: number;
   }): Promise<any> {
     return this.request<any>('/admin/circuito', {

@@ -221,7 +221,7 @@ const VotingBooth = () => {
                 </div>
                 <CardTitle className="text-3xl mb-4">Identificación del Votante</CardTitle>
                 <CardDescription className="text-lg">
-                  Ingresa tu cédula de identidad para proceder a votar
+                  Ingresa tu credencial para proceder a votar
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-8 pb-8">

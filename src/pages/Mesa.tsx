@@ -43,7 +43,7 @@ const Mesa = () => {
     if (!credencial.trim()) {
       toast({
         title: "Error",
-        description: "Por favor completa la cédula",
+        description: "Por favor completa la credencial",
         variant: "destructive",
       });
       return;
@@ -259,7 +259,7 @@ const Mesa = () => {
                     <Alert className="bg-blue-50 border-blue-200">
                       <AlertCircle className="h-4 w-4 text-blue-600" />
                       <AlertDescription className="text-blue-800">
-                        <strong>Proceso:</strong> Verifica la cédula del votante, confirma su identidad y autoriza su ingreso a la cabina de votación.
+                        <strong>Proceso:</strong> Verifica la credencial del votante, confirma su identidad y autoriza su ingreso a la cabina de votación.
                       </AlertDescription>
                     </Alert>
 
@@ -432,7 +432,7 @@ const Mesa = () => {
                 <Alert className="bg-blue-50 border-blue-200">
                   <AlertCircle className="h-4 w-4 text-blue-600" />
                   <AlertDescription className="text-blue-800">
-                    <strong>Proceso:</strong> Verifica la cédula del votante, confirma su identidad y autoriza su ingreso a la cabina de votación.
+                    <strong>Proceso:</strong> Verifica la credencial del votante, confirma su identidad y autoriza su ingreso a la cabina de votación.
                   </AlertDescription>
                 </Alert>
 
@@ -478,9 +478,9 @@ const Mesa = () => {
                 <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                   <h3 className="font-semibold mb-2">Instrucciones:</h3>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
-                    <li>Solicita al votante su cédula de identidad</li>
-                    <li>Verifica que la cédula corresponde a la persona</li>
-                    <li>Ingresa el número de cédula</li>
+                    <li>Solicita al votante su credencial</li>
+                    <li>Verifica que la credencial corresponde a la persona</li>
+                    <li>Ingresa el número de credencial</li>
                     <li>Autoriza al votante para que ingrese a la cabina</li>
                     <li>El votante puede proceder a votar en la cabina</li>
                   </ol>

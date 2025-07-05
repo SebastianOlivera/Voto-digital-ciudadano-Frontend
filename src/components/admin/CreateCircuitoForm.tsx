@@ -9,7 +9,6 @@ import { apiService } from "@/services/api";
 export const CreateCircuitoForm = () => {
   const [formData, setFormData] = useState({
     numero_circuito: "",
-    numero_mesa: "",
     establecimiento_id: ""
   });
   const [establecimientos, setEstablecimientos] = useState<any[]>([]);
@@ -31,7 +30,7 @@ export const CreateCircuitoForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.numero_circuito || !formData.numero_mesa || !formData.establecimiento_id) {
+    if (!formData.numero_circuito || !formData.establecimiento_id) {
       toast({
         title: "Error",
         description: "Todos los campos son obligatorios",
@@ -44,7 +43,6 @@ export const CreateCircuitoForm = () => {
     try {
       const result = await apiService.createCircuito({
         numero_circuito: formData.numero_circuito,
-        numero_mesa: formData.numero_mesa,
         establecimiento_id: parseInt(formData.establecimiento_id)
       });
 
@@ -57,7 +55,6 @@ export const CreateCircuitoForm = () => {
       // Limpiar formulario
       setFormData({
         numero_circuito: "",
-        numero_mesa: "",
         establecimiento_id: ""
       });
     } catch (error: any) {
@@ -87,18 +84,6 @@ export const CreateCircuitoForm = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="numero_mesa">Número de Mesa</Label>
-          <Input
-            id="numero_mesa"
-            type="text"
-            placeholder="ej: A"
-            value={formData.numero_mesa}
-            onChange={(e) => setFormData(prev => ({ ...prev, numero_mesa: e.target.value }))}
-          />
-          <p className="text-sm text-gray-500">Letra o número identificatorio de la mesa</p>
-        </div>
-
-        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="establecimiento">Establecimiento</Label>
           <Select value={formData.establecimiento_id} onValueChange={(value) => setFormData(prev => ({ ...prev, establecimiento_id: value }))}>
             <SelectTrigger>
