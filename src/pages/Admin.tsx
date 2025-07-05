@@ -29,6 +29,10 @@ import { toast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { ResultsChart } from "@/components/ResultsChart";
 import { ResultsTable } from "@/components/ResultsTable";
+import { CreateUserForm } from "@/components/admin/CreateUserForm";
+import { CreateEstablecimientoForm } from "@/components/admin/CreateEstablecimientoForm";
+import { CreateEleccionForm } from "@/components/admin/CreateEleccionForm";
+import { CreateCircuitoForm } from "@/components/admin/CreateCircuitoForm";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -655,75 +659,126 @@ const AdminPage = () => {
 
           {/* Sistema */}
           <TabsContent value="system">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5 text-purple-500" />
-                  <span>Configuración del Sistema</span>
-                </CardTitle>
-                <CardDescription>
-                  Administración general y configuraciones
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold">Base de Datos</h4>
-                    <div className="space-y-2">
-                      <Button variant="outline" className="w-full justify-start">
-                        <Users className="h-4 w-4 mr-2" />
-                        Gestionar Usuarios
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Vote className="h-4 w-4 mr-2" />
-                        Cargar Candidatos
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurar Circuitos
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start"
-                        onClick={handleUploadClick}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Cargar CSV de Credenciales
-                      </Button>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".csv"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  </div>
+            <div className="space-y-6">
+              {/* Formulario de Crear Usuario */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-500" />
+                    <span>Crear Usuario</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo usuario de mesa o presidente
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateUserForm />
+                </CardContent>
+              </Card>
 
-                  <div className="space-y-4">
-                    <h4 className="font-semibold">Mantenimiento</h4>
-                    <div className="space-y-2">
-                      <Button variant="outline" className="w-full justify-start">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Backup de Datos
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Logs del Sistema
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <TrendingUp className="h-4 w-4 mr-2" />
-                        Estadísticas
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configuración Avanzada
-                      </Button>
+              {/* Formulario de Crear Establecimiento */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <MapPin className="h-5 w-5 text-green-500" />
+                    <span>Crear Establecimiento</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo establecimiento electoral
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateEstablecimientoForm />
+                </CardContent>
+              </Card>
+
+              {/* Formulario de Crear Elección */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Vote className="h-5 w-5 text-purple-500" />
+                    <span>Crear Elección</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nueva elección con listas electorales
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateEleccionForm />
+                </CardContent>
+              </Card>
+
+              {/* Formulario de Crear Circuito */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5 text-orange-500" />
+                    <span>Crear Circuito</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo circuito electoral
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateCircuitoForm />
+                </CardContent>
+              </Card>
+
+              {/* Sección de configuración existente */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5 text-purple-500" />
+                    <span>Configuración del Sistema</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Administración general y configuraciones adicionales
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold">Base de Datos</h4>
+                      <div className="space-y-2">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={handleUploadClick}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Cargar CSV de Credenciales
+                        </Button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".csv"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-semibold">Mantenimiento</h4>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full justify-start">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Backup de Datos
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Logs del Sistema
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <TrendingUp className="h-4 w-4 mr-2" />
+                          Estadísticas
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>

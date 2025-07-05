@@ -189,13 +189,6 @@ class ApiService {
     return this.request<any>(`/resultados/circuitos/buscar?q=${encodeURIComponent(searchTerm)}`);
   }
 
-  async createEleccion(data: EleccionRequest): Promise<any> {
-    return this.request<any>('/eleccion', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
   async createCandidato(data: CandidatoRequest): Promise<any> {
     return this.request<any>('/candidato', {
       method: 'POST',
@@ -269,6 +262,69 @@ class ApiService {
     }
 
     return response.json();
+  }
+
+  // Admin endpoints
+  async createUsuario(data: {
+    username: string;
+    password: string;
+    circuito_id: number;
+    role: string;
+  }): Promise<any> {
+    return this.request<any>('/admin/usuario', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createEstablecimiento(data: {
+    nombre: string;
+    departamento: string;
+    ciudad: string;
+    zona?: string;
+    barrio?: string;
+    direccion: string;
+    tipo_establecimiento: string;
+    accesible: boolean;
+  }): Promise<any> {
+    return this.request<any>('/admin/establecimiento', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createEleccion(data: {
+    año: number;
+    listas: Array<{
+      candidato: string;
+      vicepresidente: string;
+      numero_lista: number;
+      partido: string;
+    }>;
+  }): Promise<any> {
+    return this.request<any>('/admin/eleccion', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createCircuito(data: {
+    numero_circuito: string;
+    numero_mesa: string;
+    establecimiento_id: number;
+  }): Promise<any> {
+    return this.request<any>('/admin/circuito', {
+      method: 'POST',  
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getEstablecimientosAdmin(): Promise<any> {
+    return this.request<any>('/admin/establecimientos');
+  }
+
+  async getCircuitosAdmin(): Promise<any> {
+    return this.request<any>('/admin/circuitos');
   }
 }
 

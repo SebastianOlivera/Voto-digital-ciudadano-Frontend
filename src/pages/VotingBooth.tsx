@@ -19,6 +19,7 @@ const VotingBooth = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [comprobante, setComprobante] = useState("");
 
   useEffect(() => {
     // Cargar candidatos al montar el componente
@@ -121,6 +122,12 @@ const VotingBooth = () => {
         candidato_id: candidatoId
       });
 
+      // Extraer el comprobante del mensaje de respuesta
+      const comprobanteMatch = response.mensaje.match(/Comprobante: (C\d{3}-\d{5})/);
+      if (comprobanteMatch) {
+        setComprobante(comprobanteMatch[1]);
+      }
+
       setStep(3);
       
       toast({
@@ -128,13 +135,14 @@ const VotingBooth = () => {
         description: response.mensaje,
       });
       
-      setTimeout(() => {
-        // Reiniciar la aplicación para el próximo votante
-        setStep(1);
-        setCedula("");
-        setCedulaLimpia("");
-        setSelectedVote("");
-      }, 3000);
+        setTimeout(() => {
+          // Reiniciar la aplicación para el próximo votante
+          setStep(1);
+          setCedula("");
+          setCedulaLimpia("");
+          setSelectedVote("");
+          setComprobante("");
+        }, 3000);
 
     } catch (error) {
       console.error('Error al votar:', error);
@@ -387,6 +395,17 @@ const VotingBooth = () => {
                 <p className="text-xl text-gray-600 mb-4">
                   Tu voto ha sido registrado de forma segura y anónima.
                 </p>
+                {comprobante && (
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">Número de Comprobante:</h3>
+                    <p className="text-3xl font-bold text-blue-900 font-mono tracking-wider">
+                      {comprobante}
+                    </p>
+                    <p className="text-sm text-blue-600 mt-2">
+                      Guarda este número como comprobante de tu voto
+                    </p>
+                  </div>
+                )}
                 <p className="text-lg text-gray-500 mb-8">
                   Selección: <strong>{getSelectedCandidateName()}</strong>
                 </p>
