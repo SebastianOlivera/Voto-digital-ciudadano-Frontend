@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,23 +6,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { Plus, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Lista {
   candidato: string;
   vicepresidente: string;
   numero_lista: number;
-  partido: string;
+  partido_id: number;
+}
+
+interface Partido {
+  id: number;
+  nombre: string;
+  color?: string;
 }
 
 export const CreateEleccionForm = () => {
   const [año, setAño] = useState<number>(new Date().getFullYear());
   const [listas, setListas] = useState<Lista[]>([
-    { candidato: "", vicepresidente: "", numero_lista: 0, partido: "" }
+    { candidato: "", vicepresidente: "", numero_lista: 0, partido_id: 0 }
   ]);
+  const [partidos, setPartidos] = useState<Partido[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Cargar partidos al montar el componente
+  useEffect(() => {
+    const fetchPartidos = async () => {
+      try {
+        const partidosData = await apiService.getPartidos();
+        setPartidos(partidosData);
+      } catch (error) {
+        console.error("Error cargando partidos:", error);
+      }
+    };
+    fetchPartidos();
+  }, []);
+
   const addLista = () => {
-    setListas([...listas, { candidato: "", vicepresidente: "", numero_lista: 0, partido: "" }]);
+    setListas([...listas, { candidato: "", vicepresidente: "", numero_lista: 0, partido_id: 0 }]);
   };
 
   const removeLista = (index: number) => {
@@ -51,7 +72,7 @@ export const CreateEleccionForm = () => {
 
     // Validar listas
     const listasValidas = listas.filter(lista => 
-      lista.candidato && lista.vicepresidente && lista.numero_lista > 0 && lista.partido
+      lista.candidato && lista.vicepresidente && lista.numero_lista > 0 && lista.partido_id > 0
     );
 
     if (listasValidas.length === 0) {
@@ -90,7 +111,7 @@ export const CreateEleccionForm = () => {
 
       // Limpiar formulario
       setAño(new Date().getFullYear());
-      setListas([{ candidato: "", vicepresidente: "", numero_lista: 0, partido: "" }]);
+      setListas([{ candidato: "", vicepresidente: "", numero_lista: 0, partido_id: 0 }]);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -177,12 +198,21 @@ export const CreateEleccionForm = () => {
 
                 <div className="space-y-1">
                   <Label>Partido</Label>
-                  <Input
-                    type="text"
-                    placeholder="Nombre del partido"
-                    value={lista.partido}
-                    onChange={(e) => updateLista(index, 'partido', e.target.value)}
-                  />
+                  <Select 
+                    value={lista.partido_id.toString()} 
+                    onValueChange={(value) => updateLista(index, 'partido_id', parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar partido" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {partidos.map((partido) => (
+                        <SelectItem key={partido.id} value={partido.id.toString()}>
+                          {partido.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>

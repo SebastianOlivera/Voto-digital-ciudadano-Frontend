@@ -33,6 +33,7 @@ import { CreateUserForm } from "@/components/admin/CreateUserForm";
 import { CreateEstablecimientoForm } from "@/components/admin/CreateEstablecimientoForm";
 import { CreateEleccionForm } from "@/components/admin/CreateEleccionForm";
 import { CreateCircuitoForm } from "@/components/admin/CreateCircuitoForm";
+import { CreatePartidoForm } from "@/components/admin/CreatePartidoForm";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -192,7 +193,7 @@ const AdminPage = () => {
       const headers = lines[0].split(',').map(h => h.trim());
       
       // Validar headers esperados
-      const expectedHeaders = ['circuito_numero', 'establecimiento_nombre', 'departamento', 'ciudad', 'direccion', 'mesa_letra', 'cedula_autorizada'];
+      const expectedHeaders = ['circuito_numero', 'establecimiento_nombre', 'departamento', 'ciudad', 'direccion', 'mesa_letra', 'credencial_autorizada'];
       const hasValidHeaders = expectedHeaders.every(header => headers.includes(header));
       
       if (!hasValidHeaders) {

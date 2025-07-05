@@ -14,7 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface VotoObservado {
   id: number;
-  cedula: string;
+  credencial: string;
   fecha_hora: string;
   candidato_id: number;
 }
@@ -22,7 +22,7 @@ interface VotoObservado {
 const Mesa = () => {
   const navigate = useNavigate();
   const { circuito, username, role } = useAuth();
-  const [cedula, setCedula] = useState("");
+  const [credencial, setCredencial] = useState("");
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [authorizedCount, setAuthorizedCount] = useState(0);
   const [votosObservados, setVotosObservados] = useState<VotoObservado[]>([]);
@@ -30,7 +30,6 @@ const Mesa = () => {
   const [mesaEstado, setMesaEstado] = useState("abierta");
   const [showVotoObservado, setShowVotoObservado] = useState(false);
   const [votoObservadoData, setVotoObservadoData] = useState({
-    cedula: "",
     credencial: "",
     circuitoOrigen: ""
   });
@@ -41,7 +40,7 @@ const Mesa = () => {
   const handleAuthorizeVoter = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!cedula.trim()) {
+    if (!credencial.trim()) {
       toast({
         title: "Error",
         description: "Por favor completa la cédula",
@@ -63,17 +62,17 @@ const Mesa = () => {
 
     try {
       await apiService.enableVote({
-        credencial: cedula,
+        credencial: credencial,
         circuito: circuito?.numero_circuito || "001"
       });
 
       toast({
         title: "Votante autorizado",
-        description: `Cédula ${cedula} habilitada para votar`,
+        description: `Credencial ${credencial} habilitada para votar`,
       });
 
       setAuthorizedCount(prev => prev + 1);
-      setCedula("");
+      setCredencial("");
     } catch (error: any) {
       console.error('Error autorizando votante:', error);
       toast({
@@ -89,7 +88,7 @@ const Mesa = () => {
   const handleVotoObservado = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!votoObservadoData.cedula.trim() || !votoObservadoData.credencial.trim() || !votoObservadoData.circuitoOrigen.trim()) {
+    if (!votoObservadoData.credencial.trim() || !votoObservadoData.circuitoOrigen.trim()) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos",
@@ -114,7 +113,7 @@ const Mesa = () => {
         credencial: votoObservadoData.credencial,
         circuito: votoObservadoData.circuitoOrigen,
         esEspecial: true,
-        cedula_real: votoObservadoData.cedula
+        credencial_civica: votoObservadoData.credencial
       });
 
       toast({
@@ -123,7 +122,7 @@ const Mesa = () => {
         variant: "default",
       });
 
-      setVotoObservadoData({ cedula: "", credencial: "", circuitoOrigen: "" });
+      setVotoObservadoData({ credencial: "", circuitoOrigen: "" });
       setShowVotoObservado(false);
     } catch (error) {
       console.error('Error autorizando voto observado:', error);
@@ -266,13 +265,13 @@ const Mesa = () => {
 
                     <form onSubmit={handleAuthorizeVoter} className="space-y-4">
                       <div>
-                        <Label htmlFor="cedula">Cédula de Identidad</Label>
+                         <Label htmlFor="credencial">Credencial</Label>
                         <Input
-                          id="cedula"
+                          id="credencial"
                           type="text"
-                          placeholder="1.234.567-8"
-                          value={cedula}
-                          onChange={(e) => setCedula(e.target.value)}
+                          placeholder="ABC123456"
+                          value={credencial}
+                          onChange={(e) => setCredencial(e.target.value)}
                           className="text-lg"
                           disabled={mesaEstado === "cerrada"}
                         />
@@ -330,7 +329,7 @@ const Mesa = () => {
                           <div key={voto.id} className="border rounded-lg p-4 bg-yellow-50">
                             <div className="flex justify-between items-center">
                               <div>
-                                <p className="font-medium">Cédula: {voto.cedula}</p>
+                                <p className="font-medium">Credencial: {voto.credencial}</p>
                                 <p className="text-sm text-gray-600">
                                   Fecha: {new Date(voto.fecha_hora).toLocaleString()}
                                 </p>
@@ -439,13 +438,13 @@ const Mesa = () => {
 
                 <form onSubmit={handleAuthorizeVoter} className="space-y-4">
                   <div>
-                    <Label htmlFor="cedula">Cédula de Identidad</Label>
+                    <Label htmlFor="credencial">Credencial</Label>
                     <Input
-                      id="cedula"
+                      id="credencial"
                       type="text"
-                      placeholder="1.234.567-8"
-                      value={cedula}
-                      onChange={(e) => setCedula(e.target.value)}
+                      placeholder="ABC123456"
+                      value={credencial}
+                      onChange={(e) => setCredencial(e.target.value)}
                       className="text-lg"
                       disabled={mesaEstado === "cerrada"}
                     />
@@ -518,22 +517,9 @@ const Mesa = () => {
 
               <form onSubmit={handleVotoObservado} className="space-y-4">
                 <div>
-                  <Label htmlFor="cedulaObservado">Cédula de Identidad</Label>
+                  <Label htmlFor="credencial">Credencial</Label>
                   <Input
-                    id="cedulaObservado"
-                    type="text"
-                    placeholder="1.234.567-8"
-                    value={votoObservadoData.cedula}
-                    onChange={(e) => setVotoObservadoData(prev => ({ ...prev, cedula: e.target.value }))}
-                    className="mt-1"
-                    disabled={isProcessingObservado}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="credencialObservado">Credencial Cívica</Label>
-                  <Input
-                    id="credencialObservado"
+                    id="credencial"
                     type="text"
                     placeholder="ABC123456"
                     value={votoObservadoData.credencial}

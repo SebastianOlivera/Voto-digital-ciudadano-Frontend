@@ -13,8 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 const VotingBooth = () => {
   const { circuito, isAuthenticated } = useAuth();
   const [step, setStep] = useState(1);
-  const [cedula, setCedula] = useState("");
-  const [cedulaLimpia, setCedulaLimpia] = useState("");
+  const [credencial, setCredencial] = useState("");
+  const [credencialLimpia, setCredencialLimpia] = useState("");
   const [selectedVote, setSelectedVote] = useState<string>("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [partidos, setPartidos] = useState<Partido[]>([]);
@@ -45,24 +45,24 @@ const VotingBooth = () => {
 
   const handleCredentialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cedulaNormalizada = cedula.replace(/[.-\s]/g, ''); // Remover puntos, guiones y espacios
-    if (!cedulaNormalizada.trim()) {
+    const credencialNormalizada = credencial.replace(/[.-\s]/g, ''); // Remover puntos, guiones y espacios
+    if (!credencialNormalizada.trim()) {
       toast({
         title: "Error",
-        description: "Por favor ingresa tu cédula de identidad",
+        description: "Por favor ingresa tu credencial",
         variant: "destructive",
       });
       return;
     }
 
-    setCedulaLimpia(cedulaNormalizada); // Guardar la cédula normalizada
+    setCredencialLimpia(credencialNormalizada); // Guardar la credencial normalizada
     setIsVerifying(true);
     
     try {
       // Verificar si el votante está autorizado por la mesa
       // Usar el circuito del contexto de autenticación
       const currentCircuito = circuito?.numero_circuito || "1"; // Fallback a "1" si no hay circuito
-      const votanteData = await apiService.getVotante(currentCircuito, cedulaNormalizada);
+      const votanteData = await apiService.getVotante(currentCircuito, credencialNormalizada);
       
       if (votanteData && votanteData.estado === 'HABILITADA') {
         toast({
@@ -118,7 +118,7 @@ const VotingBooth = () => {
       }
 
       const response = await apiService.votar({
-        cedula: cedulaLimpia,
+        credencial: credencialLimpia,
         candidato_id: candidatoId
       });
 
@@ -138,8 +138,8 @@ const VotingBooth = () => {
         setTimeout(() => {
           // Reiniciar la aplicación para el próximo votante
           setStep(1);
-          setCedula("");
-          setCedulaLimpia("");
+          setCredencial("");
+          setCredencialLimpia("");
           setSelectedVote("");
           setComprobante("");
         }, 3000);
@@ -234,16 +234,16 @@ const VotingBooth = () => {
 
                 <form onSubmit={handleCredentialSubmit} className="space-y-6">
                   <div>
-                    <Label htmlFor="cedula" className="text-lg font-semibold">Cédula de Identidad</Label>
+                    <Label htmlFor="credencial" className="text-lg font-semibold">Credencial</Label>
                     <Input
-                      id="cedula"
+                      id="credencial"
                       type="text"
-                      placeholder="Ej: 12345678"
-                      value={cedula}
-                      onChange={(e) => setCedula(e.target.value)}
+                      placeholder="Ej: ABC123456"
+                      value={credencial}
+                      onChange={(e) => setCredencial(e.target.value)}
                       className="text-center text-2xl py-4 mt-2"
                     />
-                    <p className="text-sm text-gray-500 mt-2">Ingresa solo números, sin puntos ni guiones</p>
+                    <p className="text-sm text-gray-500 mt-2">Ingresa tu credencial, ej: ABC123456</p>
                   </div>
                   
                   <Button 
@@ -285,33 +285,60 @@ const VotingBooth = () => {
                   <div className="grid gap-6">
                     {/* Candidatos por partido */}
                     {partidos.map((partido) => (
-                      partido.candidatos.map((candidato) => (
-                        <div
-                          key={candidato.id}
-                          className={`p-6 border-3 rounded-xl cursor-pointer transition-all duration-300 ${
-                            selectedVote === candidato.id.toString()
-                              ? 'border-blue-500 bg-blue-50 shadow-lg'
-                              : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
-                          }`}
-                          onClick={() => handleVoteSelection(candidato.id.toString())}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-2xl font-bold mb-2">{candidato.nombre}</h3>
-                              <p className="text-lg text-gray-600">{partido.partido}</p>
-                            </div>
-                            <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center ${
+                      partido.candidatos.map((candidato) => {
+                        const partidoColor = partido.color || '#D3D3D3';
+                        const bgColor = selectedVote === candidato.id.toString() 
+                          ? `${partidoColor}80` // 50% transparencia
+                          : `${partidoColor}20`; // 12.5% transparencia para hover
+                        
+                        return (
+                          <div
+                            key={candidato.id}
+                            className={`p-6 border-3 rounded-xl cursor-pointer transition-all duration-300 ${
                               selectedVote === candidato.id.toString()
-                                ? 'border-blue-500 bg-blue-500'
-                                : 'border-gray-400'
-                            }`}>
-                              {selectedVote === candidato.id.toString() && (
-                                <Check className="h-5 w-5 text-white" />
-                              )}
+                                ? 'border-primary shadow-lg'
+                                : 'border-gray-200 hover:border-gray-400'
+                            }`}
+                            style={{
+                              backgroundColor: selectedVote === candidato.id.toString() ? bgColor : 'transparent',
+                              borderColor: selectedVote === candidato.id.toString() ? partidoColor : undefined
+                            }}
+                            onMouseEnter={(e) => {
+                              if (selectedVote !== candidato.id.toString()) {
+                                e.currentTarget.style.backgroundColor = `${partidoColor}20`;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (selectedVote !== candidato.id.toString()) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                            onClick={() => handleVoteSelection(candidato.id.toString())}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-2xl font-bold mb-2">{candidato.nombre}</h3>
+                                <p className="text-lg text-gray-600">{partido.partido}</p>
+                              </div>
+                              <div 
+                                className={`w-8 h-8 rounded-full border-3 flex items-center justify-center ${
+                                  selectedVote === candidato.id.toString()
+                                    ? 'border-primary'
+                                    : 'border-gray-400'
+                                }`}
+                                style={{
+                                  backgroundColor: selectedVote === candidato.id.toString() ? partidoColor : 'transparent',
+                                  borderColor: selectedVote === candidato.id.toString() ? partidoColor : undefined
+                                }}
+                              >
+                                {selectedVote === candidato.id.toString() && (
+                                  <Check className="h-5 w-5 text-white" />
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ))}
                     
                     {/* Voto en Blanco */}

@@ -9,10 +9,11 @@ export interface Candidato {
 export interface Partido {
   partido: string;
   candidatos: Candidato[];
+  color?: string;
 }
 
 export interface VotoRequest {
-  cedula: string;
+  credencial: string;
   candidato_id: number;
 }
 
@@ -20,7 +21,7 @@ export interface VoteEnableRequest {
   credencial?: string;
   circuito: string;
   esEspecial?: boolean;
-  cedula_real?: string;
+  credencial_civica?: string;
 }
 
 export interface LoginRequest {
@@ -159,7 +160,7 @@ class ApiService {
   }
 
   async getVotante(circuito: string, votante: string): Promise<any> {
-    return this.request<any>(`/vote/${circuito}/${votante}`);
+    return this.request<any>(`/votantes/${circuito}/${votante}`);
   }
 
   async getListas(): Promise<any> {
@@ -248,8 +249,8 @@ class ApiService {
     return this.request<any>('/circuito/estado');
   }
 
-  async getCircuitoByCedula(cedula: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/credenciales/circuito/${cedula}`, {
+  async getCircuitoByCredencial(credencial: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/credenciales/circuito/${credencial}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${this.getToken()}`
@@ -258,7 +259,7 @@ class ApiService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || 'Error consultando cédula');
+      throw new Error(errorData.detail || 'Error consultando credencial');
     }
 
     return response.json();
@@ -299,13 +300,17 @@ class ApiService {
       candidato: string;
       vicepresidente: string;
       numero_lista: number;
-      partido: string;
+      partido_id: number;
     }>;
   }): Promise<any> {
     return this.request<any>('/admin/eleccion', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+
+  async getPartidos(): Promise<any[]> {
+    return this.request<any[]>('/admin/partidos');
   }
 
   async createCircuito(data: {
@@ -315,6 +320,16 @@ class ApiService {
   }): Promise<any> {
     return this.request<any>('/admin/circuito', {
       method: 'POST',  
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createPartido(data: {
+    nombre: string;
+    color: string;
+  }): Promise<any> {
+    return this.request<any>('/admin/partido', {
+      method: 'POST',
       body: JSON.stringify(data),
     });
   }
