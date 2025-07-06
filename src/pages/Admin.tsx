@@ -237,6 +237,9 @@ const AdminPage = () => {
         // Llamar al endpoint para cargar credenciales
         const response = await apiService.uploadCredencialesCSV(processedData);
         
+        // Recargar departamentos después de cargar el CSV
+        await loadDepartamentos();
+        
         toast({
           title: "CSV Cargado",
           description: response.mensaje || `Se procesaron ${processedData.length} registros exitosamente.`,
