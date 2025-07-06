@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, username, circuito, logout } = useAuth();
+  const [eleccionInfo, setEleccionInfo] = useState<any>(null);
   const [stats, setStats] = useState({
     totalVotes: 0,
     totalVoters: 0,
@@ -20,6 +21,18 @@ const Index = () => {
     totalTables: 0
   });
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadEleccionInfo = async () => {
+      try {
+        const info = await apiService.getEleccionActiva();
+        setEleccionInfo(info);
+      } catch (error) {
+        console.error('Error cargando información de la elección:', error);
+      }
+    };
+    loadEleccionInfo();
+  }, []);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -59,7 +72,7 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Sistema Electoral</h1>
-                <p className="text-sm text-gray-600">Elecciones Presidenciales 2024</p>
+                <p className="text-sm text-gray-600">Elecciones Presidenciales {eleccionInfo?.año || 2024}</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -78,7 +91,10 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={logout}
+                    onClick={() => {
+                      logout();
+                      navigate('/');
+                    }}
                     className="flex items-center space-x-2"
                   >
                     <LogIn className="h-4 w-4" />
@@ -89,7 +105,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/')}
                   className="flex items-center space-x-2"
                 >
                   <LogIn className="h-4 w-4" />
@@ -108,8 +124,9 @@ const Index = () => {
             <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
             <span>Votación en Curso</span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Elecciones Presidenciales 2024</h2>
-          <p className="text-gray-600">Domingo 27 de Octubre - 8:00 a 18:00 hrs</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Elecciones Presidenciales {eleccionInfo?.año || 2024}
+          </h2>
         </div>
 
 

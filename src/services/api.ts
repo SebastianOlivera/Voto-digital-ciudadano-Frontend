@@ -9,7 +9,6 @@ export interface Candidato {
 export interface Partido {
   partido: string;
   candidatos: Candidato[];
-  color?: string;
 }
 
 export interface VotoRequest {
@@ -66,6 +65,7 @@ export interface LoginResponse {
   circuito: CircuitoInfo;
   username: string;
   role: string;
+  mesa_cerrada?: boolean;
 }
 
 export interface VotoResponse {
@@ -149,7 +149,7 @@ class ApiService {
   }
 
   async enableVote(data: VoteEnableRequest): Promise<any> {
-    return this.request<any>('/vote/enable', {
+    return this.request<any>('/votantes/enable', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -187,7 +187,19 @@ class ApiService {
   }
 
   async buscarCircuitos(searchTerm: string): Promise<any> {
-    return this.request<any>(`/resultados/circuitos/buscar?q=${encodeURIComponent(searchTerm)}`);
+    console.log('🔍 ApiService.buscarCircuitos llamado con:', searchTerm);
+    try {
+      const result = await this.request<any>(`/resultados/circuitos/buscar?q=${encodeURIComponent(searchTerm)}`);
+      console.log('🔍 ApiService.buscarCircuitos resultado:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ ApiService.buscarCircuitos error:', error);
+      throw error;
+    }
+  }
+
+  async getEleccionActiva(): Promise<any> {
+    return this.request<any>('/eleccion/activa');
   }
 
   async createCandidato(data: CandidatoRequest): Promise<any> {
@@ -325,7 +337,6 @@ class ApiService {
 
   async createPartido(data: {
     nombre: string;
-    color: string;
   }): Promise<any> {
     return this.request<any>('/admin/partido', {
       method: 'POST',

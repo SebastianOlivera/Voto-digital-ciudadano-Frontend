@@ -7,6 +7,8 @@ import { toast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { Plus, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CreatePartidoForm } from "./CreatePartidoForm";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Lista {
   candidato: string;
@@ -21,24 +23,30 @@ interface Partido {
   color?: string;
 }
 
-export const CreateEleccionForm = () => {
+interface CreateEleccionFormProps {
+  onElectionCreated?: () => void;
+}
+
+export const CreateEleccionForm = ({ onElectionCreated }: CreateEleccionFormProps) => {
   const [año, setAño] = useState<number>(new Date().getFullYear());
   const [listas, setListas] = useState<Lista[]>([
     { candidato: "", vicepresidente: "", numero_lista: 0, partido_id: 0 }
   ]);
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showCreatePartido, setShowCreatePartido] = useState(false);
 
   // Cargar partidos al montar el componente
+  const fetchPartidos = async () => {
+    try {
+      const partidosData = await apiService.getPartidos();
+      setPartidos(partidosData);
+    } catch (error) {
+      console.error("Error cargando partidos:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchPartidos = async () => {
-      try {
-        const partidosData = await apiService.getPartidos();
-        setPartidos(partidosData);
-      } catch (error) {
-        console.error("Error cargando partidos:", error);
-      }
-    };
     fetchPartidos();
   }, []);
 
@@ -112,6 +120,9 @@ export const CreateEleccionForm = () => {
       // Limpiar formulario
       setAño(new Date().getFullYear());
       setListas([{ candidato: "", vicepresidente: "", numero_lista: 0, partido_id: 0 }]);
+      
+      // Llamar callback si existe
+      onElectionCreated?.();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -197,7 +208,28 @@ export const CreateEleccionForm = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label>Partido</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Partido</Label>
+                    <Dialog open={showCreatePartido} onOpenChange={setShowCreatePartido}>
+                      <DialogTrigger asChild>
+                        <Button type="button" variant="outline" size="sm">
+                          <Plus className="h-3 w-3 mr-1" />
+                          Nuevo
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Crear Nuevo Partido</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <CreatePartidoForm onPartidoCreated={() => {
+                            setShowCreatePartido(false);
+                            fetchPartidos(); // Recargar lista de partidos
+                          }} />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                   <Select 
                     value={lista.partido_id.toString()} 
                     onValueChange={(value) => updateLista(index, 'partido_id', parseInt(value))}

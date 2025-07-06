@@ -45,7 +45,7 @@ const LoginPage = () => {
       if (role === 'superadmin') {
         navigate('/admin');
       } else {
-        navigate('/');
+        navigate('/sistema-electoral');
       }
     } catch (error) {
       console.error('Error de login:', error);
@@ -64,14 +64,15 @@ const LoginPage = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Volver al Inicio</span>
-          </Button>
+          <div className="flex items-center space-x-3">
+            <div className="bg-blue-600 rounded-lg p-2">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Sistema Electoral</h1>
+              <p className="text-sm text-gray-600">Acceso Autorizado</p>
+            </div>
+          </div>
         </div>
       </header>
 

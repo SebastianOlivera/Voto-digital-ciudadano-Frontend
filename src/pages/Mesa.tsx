@@ -21,13 +21,13 @@ interface VotoObservado {
 
 const Mesa = () => {
   const navigate = useNavigate();
-  const { circuito, username, role } = useAuth();
+  const { circuito, username, role, mesaCerrada, updateMesaCerrada } = useAuth();
   const [credencial, setCredencial] = useState("");
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [authorizedCount, setAuthorizedCount] = useState(0);
   const [votosObservados, setVotosObservados] = useState<VotoObservado[]>([]);
   const [isClosingMesa, setIsClosingMesa] = useState(false);
-  const [mesaEstado, setMesaEstado] = useState("abierta");
+  const [mesaEstado, setMesaEstado] = useState(mesaCerrada ? "cerrada" : "abierta");
   const [showVotoObservado, setShowVotoObservado] = useState(false);
   const [votoObservadoData, setVotoObservadoData] = useState({
     credencial: "",
@@ -177,6 +177,7 @@ const Mesa = () => {
     try {
       await apiService.cerrarMesa({ circuito: circuito?.numero_circuito || "001" });
       setMesaEstado("cerrada");
+      updateMesaCerrada(true); // Actualizar contexto auth
       toast({
         title: "Mesa cerrada",
         description: "La mesa ha sido cerrada exitosamente",
@@ -534,7 +535,7 @@ const Mesa = () => {
                   <Input
                     id="circuitoOrigen"
                     type="text"
-                    placeholder="001"
+                    placeholder="1"
                     value={votoObservadoData.circuitoOrigen}
                     onChange={(e) => setVotoObservadoData(prev => ({ ...prev, circuitoOrigen: e.target.value }))}
                     className="mt-1"

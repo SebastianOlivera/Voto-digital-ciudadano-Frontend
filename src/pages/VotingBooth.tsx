@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,7 @@ const VotingBooth = () => {
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [comprobante, setComprobante] = useState("");
+  const [eleccionInfo, setEleccionInfo] = useState<any>(null);
 
   useEffect(() => {
     // Cargar candidatos al montar el componente
@@ -40,7 +40,17 @@ const VotingBooth = () => {
       }
     };
 
+    const loadEleccionInfo = async () => {
+      try {
+        const info = await apiService.getEleccionActiva();
+        setEleccionInfo(info);
+      } catch (error) {
+        console.error('Error cargando información de la elección:', error);
+      }
+    };
+
     loadCandidatos();
+    loadEleccionInfo();
   }, []);
 
   const handleCredentialSubmit = async (e: React.FormEvent) => {
@@ -204,7 +214,7 @@ const VotingBooth = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Cabina de Votación</h1>
-                <p className="text-lg text-gray-600">Elecciones Presidenciales 2024</p>
+                <p className="text-lg text-gray-600">Elecciones Presidenciales {eleccionInfo?.año || 2024}</p>
               </div>
             </div>
           </div>
@@ -284,62 +294,37 @@ const VotingBooth = () => {
                 <CardContent className="p-8">
                   <div className="grid gap-6">
                     {/* Candidatos por partido */}
-                    {partidos.map((partido) => (
-                      partido.candidatos.map((candidato) => {
-                        const partidoColor = partido.color || '#D3D3D3';
-                        const bgColor = selectedVote === candidato.id.toString() 
-                          ? `${partidoColor}80` // 50% transparencia
-                          : `${partidoColor}20`; // 12.5% transparencia para hover
-                        
-                        return (
-                          <div
-                            key={candidato.id}
-                            className={`p-6 border-3 rounded-xl cursor-pointer transition-all duration-300 ${
-                              selectedVote === candidato.id.toString()
-                                ? 'border-primary shadow-lg'
-                                : 'border-gray-200 hover:border-gray-400'
-                            }`}
-                            style={{
-                              backgroundColor: selectedVote === candidato.id.toString() ? bgColor : 'transparent',
-                              borderColor: selectedVote === candidato.id.toString() ? partidoColor : undefined
-                            }}
-                            onMouseEnter={(e) => {
-                              if (selectedVote !== candidato.id.toString()) {
-                                e.currentTarget.style.backgroundColor = `${partidoColor}20`;
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (selectedVote !== candidato.id.toString()) {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                            onClick={() => handleVoteSelection(candidato.id.toString())}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h3 className="text-2xl font-bold mb-2">{candidato.nombre}</h3>
-                                <p className="text-lg text-gray-600">{partido.partido}</p>
-                              </div>
-                              <div 
-                                className={`w-8 h-8 rounded-full border-3 flex items-center justify-center ${
-                                  selectedVote === candidato.id.toString()
-                                    ? 'border-primary'
-                                    : 'border-gray-400'
-                                }`}
-                                style={{
-                                  backgroundColor: selectedVote === candidato.id.toString() ? partidoColor : 'transparent',
-                                  borderColor: selectedVote === candidato.id.toString() ? partidoColor : undefined
-                                }}
-                              >
-                                {selectedVote === candidato.id.toString() && (
-                                  <Check className="h-5 w-5 text-white" />
-                                )}
-                              </div>
+                    {partidos.map((partido) => 
+                      partido.candidatos.map((candidato) => (
+                        <div
+                          key={candidato.id}
+                          className={`p-6 border-3 rounded-xl cursor-pointer transition-all duration-300 ${
+                            selectedVote === candidato.id.toString()
+                              ? 'border-primary bg-primary/10 shadow-lg'
+                              : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                          }`}
+                          onClick={() => handleVoteSelection(candidato.id.toString())}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-2xl font-bold mb-2">{candidato.nombre}</h3>
+                              <p className="text-lg text-gray-600">{partido.partido}</p>
+                            </div>
+                            <div 
+                              className={`w-8 h-8 rounded-full border-3 flex items-center justify-center ${
+                                selectedVote === candidato.id.toString()
+                                  ? 'border-primary bg-primary'
+                                  : 'border-gray-400'
+                              }`}
+                            >
+                              {selectedVote === candidato.id.toString() && (
+                                <Check className="h-5 w-5 text-white" />
+                              )}
                             </div>
                           </div>
-                        );
-                      })
-                    ))}
+                        </div>
+                      ))
+                    )}
                     
                     {/* Voto en Blanco */}
                     <div

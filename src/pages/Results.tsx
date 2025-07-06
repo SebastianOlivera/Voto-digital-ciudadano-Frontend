@@ -67,7 +67,7 @@ const ResultsPage = () => {
   };
 
   const searchCircuits = async (term: string) => {
-    if (term.length >= 2) {
+    if (term.length >= 1) {
       try {
         const suggestions = await apiService.buscarCircuitos(term);
         setCircuitSuggestions(suggestions);
@@ -233,7 +233,7 @@ const ResultsPage = () => {
           <TabsContent value="nacional" className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Resultados Nacionales</h2>
-              <p className="text-gray-600 mb-4">Elecciones Presidenciales 2024</p>
+              <p className="text-gray-600 mb-4">Elecciones Presidenciales {results?.año_eleccion || 2024}</p>
               <Badge variant="secondary" className="bg-green-100 text-green-800">
                 Última actualización: {new Date().toLocaleTimeString()}
               </Badge>

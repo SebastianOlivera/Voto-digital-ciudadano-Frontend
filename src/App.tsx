@@ -25,12 +25,12 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/sistema-electoral" element={<Index />} />
             <Route path="/mesa" element={<Mesa />} />
             <Route path="/cabina" element={<VotingBooth />} />
             <Route path="/vote" element={<Vote />} />
             <Route path="/results" element={<Results />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<SuperAdminRoute><Admin /></SuperAdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

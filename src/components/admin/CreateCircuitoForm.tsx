@@ -76,11 +76,11 @@ export const CreateCircuitoForm = () => {
           <Input
             id="numero_circuito"
             type="text"
-            placeholder="ej: 001"
+            placeholder="ej: 1"
             value={formData.numero_circuito}
             onChange={(e) => setFormData(prev => ({ ...prev, numero_circuito: e.target.value }))}
           />
-          <p className="text-sm text-gray-500">Formato: 001, 054, etc.</p>
+          <p className="text-sm text-gray-500">Formato: 1, 2, 3, etc.</p>
         </div>
         
         <div className="space-y-2">

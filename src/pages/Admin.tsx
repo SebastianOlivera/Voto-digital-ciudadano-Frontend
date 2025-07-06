@@ -27,16 +27,18 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import { ResultsChart } from "@/components/ResultsChart";
 import { ResultsTable } from "@/components/ResultsTable";
 import { CreateUserForm } from "@/components/admin/CreateUserForm";
 import { CreateEstablecimientoForm } from "@/components/admin/CreateEstablecimientoForm";
-import { CreateEleccionForm } from "@/components/admin/CreateEleccionForm";
+import { NewElectionWarning } from "@/components/admin/NewElectionWarning";
 import { CreateCircuitoForm } from "@/components/admin/CreateCircuitoForm";
 import { CreatePartidoForm } from "@/components/admin/CreatePartidoForm";
 
 const AdminPage = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -96,16 +98,31 @@ const AdminPage = () => {
   };
 
   const searchCircuits = async (term: string) => {
-    if (term.length >= 2) {
+    console.log('=== INICIO BÚSQUEDA ===');
+    console.log('Término de búsqueda:', term);
+    console.log('Longitud del término:', term.length);
+    
+    if (term.length >= 1) {
+      console.log('Término válido, haciendo request...');
       try {
+        console.log('Llamando a apiService...');
         const suggestions = await apiService.buscarCircuitos(term);
+        console.log('Respuesta del API:', suggestions);
+        console.log('Tipo de respuesta:', typeof suggestions);
+        console.log('Es array?', Array.isArray(suggestions));
+        console.log('Longitud array:', suggestions?.length);
+        
         setCircuitSuggestions(suggestions);
+        console.log('Estado actualizado con sugerencias');
+        
       } catch (error) {
-        console.error('Error buscando circuitos:', error);
+        console.error('❌ ERROR en searchCircuits:', error);
       }
     } else {
+      console.log('Término muy corto, limpiando sugerencias');
       setCircuitSuggestions([]);
     }
+    console.log('=== FIN BÚSQUEDA ===');
   };
 
   const loadCircuitResults = async (circuito: string) => {
@@ -304,14 +321,6 @@ const AdminPage = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Volver al Inicio</span>
-            </Button>
             <div className="flex items-center space-x-3">
               <div className="bg-purple-600 rounded-lg p-2">
                 <Settings className="h-6 w-6 text-white" />
@@ -335,7 +344,10 @@ const AdminPage = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
                 className="flex items-center space-x-2"
               >
                 <Lock className="h-4 w-4" />
@@ -375,7 +387,7 @@ const AdminPage = () => {
           <TabsContent value="nacional" className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Resultados Nacionales</h2>
-              <p className="text-gray-600 mb-4">Elecciones Presidenciales 2024</p>
+              <p className="text-gray-600 mb-4">Elecciones Presidenciales {results?.año_eleccion || 2024}</p>
               <Badge variant="secondary" className="bg-green-100 text-green-800">
                 Última actualización: {new Date().toLocaleTimeString()}
               </Badge>
@@ -501,13 +513,14 @@ const AdminPage = () => {
                   <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
                 
-                {circuitSuggestions.length > 0 && (
+                {circuitSuggestions.length > 0 ? (
                   <div className="mt-2 border rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto">
                     {circuitSuggestions.map((circuit, index) => (
                       <div
-                        key={index}
+                        key={`${circuit.numero_circuito}-${index}`}
                         className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                         onClick={() => {
+                          console.log('Circuito seleccionado:', circuit);
                           setSearchCircuito(circuit.numero_circuito);
                           setCircuitSuggestions([]);
                           loadCircuitResults(circuit.numero_circuito);
@@ -520,6 +533,12 @@ const AdminPage = () => {
                       </div>
                     ))}
                   </div>
+                ) : (
+                  circuitSuggestions.length === 0 && searchCircuito.length >= 1 && (
+                    <div className="mt-2 p-3 text-sm text-gray-500 text-center">
+                      No se encontraron circuitos
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -661,71 +680,7 @@ const AdminPage = () => {
           {/* Sistema */}
           <TabsContent value="system">
             <div className="space-y-6">
-              {/* Formulario de Crear Usuario */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-blue-500" />
-                    <span>Crear Usuario</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Crear nuevo usuario de mesa o presidente
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateUserForm />
-                </CardContent>
-              </Card>
-
-              {/* Formulario de Crear Establecimiento */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <MapPin className="h-5 w-5 text-green-500" />
-                    <span>Crear Establecimiento</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Crear nuevo establecimiento electoral
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateEstablecimientoForm />
-                </CardContent>
-              </Card>
-
-              {/* Formulario de Crear Elección */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Vote className="h-5 w-5 text-purple-500" />
-                    <span>Crear Elección</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Crear nueva elección con listas electorales
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateEleccionForm />
-                </CardContent>
-              </Card>
-
-              {/* Formulario de Crear Circuito */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Settings className="h-5 w-5 text-orange-500" />
-                    <span>Crear Circuito</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Crear nuevo circuito electoral
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateCircuitoForm />
-                </CardContent>
-              </Card>
-
-              {/* Sección de configuración existente */}
+              {/* Sección de configuración del sistema */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
@@ -760,23 +715,60 @@ const AdminPage = () => {
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="font-semibold">Mantenimiento</h4>
+                      <h4 className="font-semibold">Elecciones</h4>
                       <div className="space-y-2">
-                        <Button variant="outline" className="w-full justify-start">
-                          <FileText className="h-4 w-4 mr-2" />
-                          Backup de Datos
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <BarChart3 className="h-4 w-4 mr-2" />
-                          Logs del Sistema
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <TrendingUp className="h-4 w-4 mr-2" />
-                          Estadísticas
-                        </Button>
+                        <NewElectionWarning />
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Formulario de Crear Establecimiento */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <MapPin className="h-5 w-5 text-green-500" />
+                    <span>Crear Establecimiento</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo establecimiento electoral
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateEstablecimientoForm />
+                </CardContent>
+              </Card>
+
+              {/* Formulario de Crear Circuito */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5 text-orange-500" />
+                    <span>Crear Circuito</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo circuito electoral
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateCircuitoForm />
+                </CardContent>
+              </Card>
+
+              {/* Formulario de Crear Usuario */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-500" />
+                    <span>Crear Usuario</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Crear nuevo usuario de mesa o presidente
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateUserForm />
                 </CardContent>
               </Card>
             </div>
